@@ -1,39 +1,30 @@
 package main
 
 import (
-	"log"
-	"net"
-
-	"github.com/shimo0108/task_list/server/services"
-
-	pb "github.com/shimo0108/task_list/server/proto"
-
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"github.com/shimo0108/shimo0108-app/server/models"
 )
 
 func main() {
-	// Start listening port
-	lis, err := net.Listen("tcp", ":9999")
+	e := echo.New()
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
+	initRouting(e)
 
-	// Register UsersServer to gRPC Server
-	s := grpc.NewServer()
+	e.Start(":9999")
+}
 
-	pb.RegisterTasksServer(s, &services.TaskServer{})
-	pb.RegisterCalendarsServer(s, &services.CalendarServer{})
+func initRouting(e *echo.Echo) {
+	e.GET("/api/v1/events", models.GetEvents())
+	e.POST("/api/v1/events", models.CreateEvent())
+	e.PUT("/api/v1/events/:id", models.UpdateEvent())
+	e.DELETE("/api/v1/events/:id", models.DeleteEvent())
 
-	log.Println("start")
-	//	pb.RegisterCalendarsServer(s, &services.CalendarService{})
-
-	// Add grpc.reflection.v1alpha.ServerReflection
-	reflection.Register(s)
-
-	// Start server
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	e.GET("/api/v1/calendars/:id", models.GetCalendar())
+	e.GET("/api/v1/calendars", models.GetCalendars())
+	e.POST("/api/v1/calendars", models.CreateCalendar())
+	e.PUT("/api/v1/calendars/:id", models.UpdateCalendar())
+	e.DELETE("/api/v1/calendars/:id", models.DeleteCalendar())
 }

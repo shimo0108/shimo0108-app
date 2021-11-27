@@ -2,60 +2,122 @@ package models
 
 import (
 	"log"
+	"net/http"
 	"time"
+
+	"github.com/labstack/echo"
+	"github.com/pkg/errors"
 )
 
 type Calendar struct {
-	Id         int
-	Name       string
-	Visibility bool
-	CreatedAt  time.Time
+	Id         int       `json:"id"`
+	Name       string    `json:"name"`
+	Visibility bool      `json:"visibility,string"`
+	CreatedAt  time.Time `json:"created_at"`
 }
 
-func (c *Calendar) CreateCalendar() (err error) {
-	cmd := `insert into calendars (name, visibility, created_at) values ($1, $2, $3)`
+func CreateCalendar() echo.HandlerFunc {
+	return func(c echo.Context) error {
 
-	_, err = Db.Exec(cmd,
-		c.Name,
-		c.Visibility,
-		time.Now())
+		cmd := `insert into calendars (name, visibility, created_at) values ($1, $2, $3)`
 
-	if err != nil {
-		log.Fatalln(err)
+		_, err = Db.Exec(cmd,
+			c.QueryParam("name"),
+			c.QueryParam("visibility"),
+			time.Now())
+		if err != nil {
+			log.Fatalln(err)
+		}
+		ca := &Calendar{
+			Name:       c.QueryParam("name"),
+			Visibility: stringToBool(c.QueryParam("visibility")),
+		}
+
+		return c.JSON(http.StatusOK, ca)
 	}
-	return err
 }
 
-func GetCalendar(id int) (calendar Calendar, err error) {
-	calendar = Calendar{}
-	cmd := `select id, name, visibility, created_at
-	from calendars where id = $1`
-	err = Db.QueryRow(cmd, id).Scan(
-		&calendar.Id,
-		&calendar.Name,
-		&calendar.Visibility,
-		&calendar.CreatedAt,
-	)
-	return calendar, err
-}
+func GetCalendar() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		calendar := Calendar{}
 
-func (c *Calendar) UpdateCalendar() (err error) {
-	cmd := `update calendars
-	set name = $1
-	,visibility = $2
-  where id = $3`
-	_, err = Db.Exec(cmd, c.Name, c.Visibility, c.Id)
-	if err != nil {
-		log.Fatalln(err)
+		cmd := `select id, name, visibility ,created_at
+	          from calendars where id = $1`
+		err = Db.QueryRow(cmd, c.Param("id")).Scan(
+			&calendar.Id,
+			&calendar.Name,
+			&calendar.Visibility,
+			&calendar.CreatedAt,
+		)
+		return c.JSON(http.StatusOK, &Calendar{Id: calendar.Id, Name: calendar.Name, Visibility: calendar.Visibility, CreatedAt: calendar.CreatedAt})
 	}
-	return err
 }
 
-func (c *Calendar) DeleteCalendar() (err error) {
-	cmd := `delete from calendars where id = $1`
-	_, err = Db.Exec(cmd, c.Id)
-	if err != nil {
-		log.Fatalln(err)
+func GetCalendars() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		calendar := Calendar{}
+		calendars := []*Calendar{}
+
+		rows, err := Db.Query("select id, name, visibility, created_at from calendars")
+		if err != nil {
+			return errors.Wrapf(err, "cannot connect SQL")
+		}
+		defer rows.Close()
+
+		for rows.Next() {
+			if err := rows.Scan(
+				&calendar.Id,
+				&calendar.Name,
+				&calendar.Visibility,
+				&calendar.CreatedAt); err != nil {
+				return errors.Wrapf(err, "cannot connect SQL")
+			}
+			calendars = append(calendars, &Calendar{Id: calendar.Id, Name: calendar.Name, Visibility: calendar.Visibility, CreatedAt: calendar.CreatedAt})
+		}
+
+		return c.JSON(http.StatusOK, calendars)
 	}
-	return err
+}
+
+func UpdateCalendar() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		cmd := `update calendars
+						set name = $1
+						,visibility = $2
+						where id = $3`
+
+		_, err = Db.Exec(cmd,
+			c.QueryParam("name"),
+			c.QueryParam("visibility"),
+			c.Param("id"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		e := &Calendar{
+			Id:         stringToInt(c.Param("id")),
+			Name:       c.QueryParam("name"),
+			Visibility: stringToBool(c.QueryParam("visibility")),
+		}
+
+		return c.JSON(http.StatusOK, e)
+	}
+}
+
+func DeleteCalendar() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		cmd_1 := `delete from events where calendar_id = $1`
+		_, err = Db.Exec(cmd_1, c.Param("id"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		cmd_2 := `delete from calendars where id = $1`
+		_, err = Db.Exec(cmd_2, c.Param("id"))
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		return c.JSON(http.StatusOK, "success")
+	}
 }

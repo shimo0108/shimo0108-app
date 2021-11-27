@@ -4,16 +4,19 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 
 	_ "github.com/lib/pq"
 )
 
 var Db *sql.DB
+var layout = "2006-01-02 15:04:05"
 
 var err error
 
 func init() {
-	str_connect := ("host=postgres user=shimo0108 dbname=task_list_db password=password sslmode=disable")
+	str_connect := ("host=postgres user=shimo0108 dbname=shimo_app_db password=password sslmode=disable")
 	Db, err = sql.Open("postgres", str_connect)
 	fmt.Println(Db)
 
@@ -21,4 +24,19 @@ func init() {
 		log.Fatal(err)
 	}
 	return
+}
+
+func stringToTime(str string) time.Time {
+	t, _ := time.Parse(layout, str)
+	return t
+}
+
+func stringToInt(str string) int {
+	i, _ := strconv.Atoi(str)
+	return i
+}
+
+func stringToBool(str string) bool {
+	b, _ := strconv.ParseBool(str)
+	return b
 }

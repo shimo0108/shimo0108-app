@@ -27,7 +27,7 @@ services:
     environment:
       - POSTGRES_USER=shimo0108
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=task_list_db
+      - POSTGRES_DB=shimo_app_db
     volumes:
       - postgres-data-volume:/var/lib/postgresql
       - ./server/postgres/init/:/docker-entrypoint-initdb.d

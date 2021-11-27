@@ -6,7 +6,7 @@ create table calendars (
 );
 SELECT setval('calendars_id_seq', 4, false);
 
-create table tasks (
+create table events (
   id          serial primary key,
   name        varchar(100) not null,
   start_time  timestamp not null default current_timestamp,
@@ -18,4 +18,4 @@ create table tasks (
   created_at  timestamp not null default current_timestamp,
   foreign key(calendar_id) references calendars(id)
 );
-SELECT setval('tasks_id_seq', 5, false);
+SELECT setval('events_id_seq', 5, false);

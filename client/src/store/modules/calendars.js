@@ -23,20 +23,20 @@ const mutations = {
 
 const actions = {
   async fetchCalendars({ commit }) {
-    const response = await axios.get(`${apiUrl}/calendars`);
+    const response = await axios.get(`${apiUrl}/api/v1/calendars`);
     commit('setCalendars', response.data);
   },
   async createCalendar({ commit }, calendar) {
-    const response = await axios.post(`${apiUrl}/calendars`, calendar);
+    const response = await axios.post(`${apiUrl}/api/v1//calendars`, calendar);
     commit('appendCalendar', response.data);
   },
   async updateCalendar({ dispatch, commit }, calendar) {
-    const response = await axios.put(`${apiUrl}/calendars/${calendar.id}`, calendar);
+    const response = await axios.put(`${apiUrl}/api/v1//calendars/${calendar.id}`, calendar);
     commit('updateCalendar', response.data);
     dispatch('events/fetchEvents', null, { root: true });
   },
   async deleteCalendar({ dispatch, commit }, id) {
-    const response = await axios.delete(`${apiUrl}/calendars/${id}`);
+    const response = await axios.delete(`${apiUrl}/api/v1//calendars/${id}`);
     commit('removeCalendar', response.data);
     dispatch('events/fetchEvents', null, { root: true });
   },

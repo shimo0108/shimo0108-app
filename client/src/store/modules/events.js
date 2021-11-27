@@ -36,20 +36,20 @@ const mutations = {
 
 const actions = {
   async fetchEvents({ commit }) {
-    const response = await axios.get(`${apiUrl}/events`);
+    const response = await axios.get(`${apiUrl}/api/v1/events`);
     commit('setEvents', response.data);
   },
   async createEvent({ commit }, event) {
-    const response = await axios.post(`${apiUrl}/events`, event);
+    const response = await axios.post(`${apiUrl}/api/v1/events`, event);
     commit('appendEvent', response.data);
   },
   async deleteEvent({ commit }, id) {
-    const response = await axios.delete(`${apiUrl}/events/${id}`);
+    const response = await axios.delete(`${apiUrl}/api/v1/events/${id}`);
     commit('removeEvent', response.date);
     commit('resetEvent');
   },
   async updateEvent({ commit }, event) {
-    const response = await axios.put(`${apiUrl}/events/${event.id}`, event);
+    const response = await axios.put(`${apiUrl}/api/v1/events/${event.id}`, event);
     commit('updateEvent', response.data);
   },
   setEvent({ commit }, event) {
