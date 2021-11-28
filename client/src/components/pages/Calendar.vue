@@ -18,7 +18,6 @@
         <v-calendar
           ref="calendar"
           v-model="value"
-          :events="events"
           @change="fetchEvents"
           locale="ja-jp"
           :day-format="timestamp => new Date(timestamp.date).getDate()"
@@ -64,7 +63,6 @@ export default {
   computed: {
     ...mapGetters('events', ['events', 'event', 'isEditMode', 'clickedDate']),
     title() {
-      console.log(this.value)
       return format(new Date(this.value), 'yyyy年 M月');
     },
   },

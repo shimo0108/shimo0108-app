@@ -41,14 +41,15 @@ const mutations = {
 const actions = {
   async fetchEvents({ commit }) {
     const response = await axios.get(`${apiUrl}/api/v1/events`);
-    let events = response.data
-    for (let event of events) {
-      event.start = event.start_time;
-      event.end = event.end_time;
+    let responseEvents = response.data
+    for (let event of responseEvents) {
+
+      event.start = event.start_time.slice(0, -1) + '+09:00';
+      event.end = event.end_time.slice(0, -1) + '+09:00';
       delete event.start_time;
       delete event.end_time;
     }
-    commit('setEvents', events);
+    commit('setEvents', responseEvents);
   },
   async createEvent({ commit }, event) {
     const response = await axios.post(`${apiUrl}/api/v1/events`, qs.stringify(event), formHeader);
