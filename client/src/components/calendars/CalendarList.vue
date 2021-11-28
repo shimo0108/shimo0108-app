@@ -12,15 +12,14 @@
     </v-list-item>
     <v-list-item-group :value="selectedItem">
       <v-list-item v-for="calendar in calendars" :key="calendar.id">
-        <v-list-item-content class="pa-1">
+        <v-list-item-content class="pa-0">
           <v-checkbox
             dense
             v-model="calendar.visibility"
             :color="calendar.color"
             :label="calendar.name"
             @click="toggleVisibility(calendar)"
-            class="pb-2"
-            hide-details="true"
+            class="pa-0"
           ></v-checkbox>
         </v-list-item-content>
         <v-list-item-action class="ma-0">
@@ -47,7 +46,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import CalendarFormDialog from './CalendarFormDialog';
-
 export default {
   name: 'CalendarList',
   components: { CalendarFormDialog },

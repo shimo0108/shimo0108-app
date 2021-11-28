@@ -1,8 +1,12 @@
 import axios from 'axios';
 import { isDateWithinInterval, compareDates } from '../../functions/datetime';
 import { serializeEvent } from '../../functions/serializers';
+import qs from 'qs';
 
-const apiUrl = 'http://localhost:3000';
+
+const apiUrl = 'http://localhost:9999';
+const formHeader = { headers: { 'content-type': 'application/x-www-form-urlencoded' } };
+
 
 const state = {
   events: [],
@@ -12,7 +16,7 @@ const state = {
 };
 
 const getters = {
-  events: (state) => state.events.filter((event) => event.calendar.visibility).map((event) => serializeEvent(event)),
+  events: (state) => state.events.filter((event) => event.calendar).map((event) => serializeEvent(event)),
   event: (state) => serializeEvent(state.event),
   dayEvents: (state) =>
     state.events
@@ -37,11 +41,23 @@ const mutations = {
 const actions = {
   async fetchEvents({ commit }) {
     const response = await axios.get(`${apiUrl}/api/v1/events`);
-    commit('setEvents', response.data);
+    let events = response.data
+    for (let event of events) {
+      event.start = event.start_time;
+      event.end = event.end_time;
+      delete event.start_time;
+      delete event.end_time;
+    }
+    commit('setEvents', events);
   },
   async createEvent({ commit }, event) {
-    const response = await axios.post(`${apiUrl}/api/v1/events`, event);
-    commit('appendEvent', response.data);
+    const response = await axios.post(`${apiUrl}/api/v1/events`, qs.stringify(event), formHeader);
+    response.start = response.start_time;
+    response.end = response.end_time;
+    delete response.start_time;
+    delete response.end_time;
+
+    commit('appendEvent', event);
   },
   async deleteEvent({ commit }, id) {
     const response = await axios.delete(`${apiUrl}/api/v1/events/${id}`);
@@ -49,7 +65,7 @@ const actions = {
     commit('resetEvent');
   },
   async updateEvent({ commit }, event) {
-    const response = await axios.put(`${apiUrl}/api/v1/events/${event.id}`, event);
+    const response = await axios.put(`${apiUrl}/api/v1/events/${event.id}`, qs.stringify(event), formHeader);
     commit('updateEvent', response.data);
   },
   setEvent({ commit }, event) {

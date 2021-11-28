@@ -21,8 +21,8 @@
           :events="events"
           @change="fetchEvents"
           locale="ja-jp"
-          :day-format="(timestamp) => new Date(timestamp.date).getDate()"
-          :month-format="(timestamp) => new Date(timestamp.date).getMonth() + 1 + ' /'"
+          :day-format="timestamp => new Date(timestamp.date).getDate()"
+          :month-format="timestamp => new Date(timestamp.date).getMonth() + 1 + ' /'"
           @click:event="showEvent"
           @click:day="initEvent"
           @click:date="showDayEvents"
@@ -35,6 +35,7 @@
       <EventDetailDialog v-if="event !== null && !isEditMode" />
       <EventFormDialog v-if="event !== null && isEditMode" />
     </v-dialog>
+
     <v-dialog :value="clickedDate !== null" @click:outside="closeDialog" width="600">
       <DayEventList />
     </v-dialog>
@@ -49,7 +50,6 @@ import EventFormDialog from '../events/EventFormDialog';
 import DayEventList from '../events/DayEventList';
 import CalendarList from '../calendars/CalendarList';
 import { getDefaultStartAndEnd } from '../../functions/datetime';
-
 export default {
   name: 'Calendar',
   components: {
@@ -60,11 +60,11 @@ export default {
   },
   data: () => ({
     value: format(new Date(), 'yyyy/MM/dd'),
-    dialogMessage: '',
   }),
   computed: {
     ...mapGetters('events', ['events', 'event', 'isEditMode', 'clickedDate']),
     title() {
+      console.log(this.value)
       return format(new Date(this.value), 'yyyy年 M月');
     },
   },
@@ -83,10 +83,10 @@ export default {
       this.setClickedDate(null);
     },
     initEvent({ date }) {
+      date = date.replace(/-/g, '/');
       if (this.clickedDate !== null) {
         return;
       }
-      date = date.replace(/-/g, '/');
       const [start, end] = getDefaultStartAndEnd(date);
       this.setEvent({ name: '', start, end, timed: true });
       this.setEditMode(true);

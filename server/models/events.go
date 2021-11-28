@@ -10,15 +10,15 @@ import (
 )
 
 type Event struct {
-	Id          int       `json:"id"`
-	Name        string    `json:"name"`
-	StartTime   time.Time `json:"start_time,string"`
-	EndTime     time.Time `json:"end_time,string"`
-	CalendarId  int       `json:"calendar_id"`
-	Timed       bool      `json:"timed,string"`
-	Description string    `json:"description"`
-	Color       string    `json:"color"`
-	CreatedAt   time.Time `json:"created_at"`
+	Id          int       `json:"id" form:"id"`
+	Name        string    `json:"name" form:"name"`
+	StartTime   time.Time `json:"start_time" form:"start"`
+	EndTime     time.Time `json:"end_time" form:"end"`
+	CalendarId  int       `json:"calendar_id" form:"calendar_id"`
+	Timed       bool      `json:"timed" form:"timed"`
+	Description string    `json:"description" form:"description"`
+	Color       string    `json:"color" form:"color"`
+	CreatedAt   time.Time `json:"created_at" form:"created_at"`
 }
 
 func CreateEvent() echo.HandlerFunc {
@@ -27,25 +27,25 @@ func CreateEvent() echo.HandlerFunc {
 		cmd := `insert into events (name, start_time, end_time, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8)`
 
 		_, err = Db.Exec(cmd,
-			c.QueryParam("name"),
-			c.QueryParam("start_time"),
-			c.QueryParam("end_time"),
-			c.QueryParam("calendar_id"),
-			c.QueryParam("timed"),
-			c.QueryParam("description"),
-			c.QueryParam("color"),
+			c.FormValue("name"),
+			c.FormValue("start"),
+			c.FormValue("end"),
+			c.FormValue("calendar_id"),
+			c.FormValue("timed"),
+			c.FormValue("description"),
+			c.FormValue("color"),
 			time.Now())
 		if err != nil {
 			log.Fatalln(err)
 		}
 		e := &Event{
-			Name:        c.QueryParam("name"),
-			StartTime:   stringToTime(c.QueryParam("start_time")),
-			EndTime:     stringToTime(c.QueryParam("end_time")),
-			CalendarId:  stringToInt(c.QueryParam("calendar_id")),
-			Timed:       stringToBool(c.QueryParam("timed")),
-			Description: c.QueryParam("description"),
-			Color:       c.QueryParam("color"),
+			Name:        c.FormValue("name"),
+			StartTime:   stringToTime(c.FormValue("start")),
+			EndTime:     stringToTime(c.FormValue("end")),
+			CalendarId:  stringToInt(c.FormValue("calendar_id")),
+			Timed:       stringToBool(c.FormValue("timed")),
+			Description: c.FormValue("description"),
+			Color:       c.FormValue("color"),
 		}
 
 		return c.JSON(http.StatusOK, e)
@@ -89,26 +89,26 @@ func UpdateEvent() echo.HandlerFunc {
 		cmd := `update events set name = $1 ,start_time = $2 ,end_time = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`
 
 		_, err = Db.Exec(cmd,
-			c.QueryParam("name"),
-			c.QueryParam("start_time"),
-			c.QueryParam("end_time"),
-			c.QueryParam("calendar_id"),
-			c.QueryParam("timed"),
-			c.QueryParam("description"),
-			c.QueryParam("color"),
+			c.FormValue("name"),
+			c.FormValue("start_time"),
+			c.FormValue("end_time"),
+			c.FormValue("calendar_id"),
+			c.FormValue("timed"),
+			c.FormValue("description"),
+			c.FormValue("color"),
 			c.Param("id"))
 		if err != nil {
 			log.Fatalln(err)
 		}
 		e := &Event{
 			Id:          stringToInt(c.Param("id")),
-			Name:        c.QueryParam("name"),
-			StartTime:   stringToTime(c.QueryParam("start_time")),
-			EndTime:     stringToTime(c.QueryParam("end_time")),
-			CalendarId:  stringToInt(c.QueryParam("calendar_id")),
-			Timed:       stringToBool(c.QueryParam("timed")),
-			Description: c.QueryParam("description"),
-			Color:       c.QueryParam("color"),
+			Name:        c.FormValue("name"),
+			StartTime:   stringToTime(c.FormValue("start_time")),
+			EndTime:     stringToTime(c.FormValue("end_time")),
+			CalendarId:  stringToInt(c.FormValue("calendar_id")),
+			Timed:       stringToBool(c.FormValue("timed")),
+			Description: c.FormValue("description"),
+			Color:       c.FormValue("color"),
 		}
 
 		return c.JSON(http.StatusOK, e)

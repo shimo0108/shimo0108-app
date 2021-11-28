@@ -21,7 +21,6 @@ import { validationMixin } from 'vuelidate';
 import { required } from 'vuelidate/lib/validators';
 import DialogSection from '../layouts/DialogSection';
 import ColorForm from '../forms/ColorForm';
-
 export default {
   name: 'CalendarFormDialog',
   mixins: [validationMixin],

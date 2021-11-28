@@ -13,7 +13,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-
 export default {
   name: 'CalendarSelectForm',
   props: ['value'],

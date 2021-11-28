@@ -2,6 +2,7 @@ create table calendars (
   id          serial primary key,
   name        varchar(100) not null,
   visibility  boolean default true,
+  color       varchar(16),
   created_at  timestamp not null default current_timestamp
 );
 SELECT setval('calendars_id_seq', 4, false);

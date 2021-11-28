@@ -14,7 +14,7 @@
         <div v-show="!allDay">
           <TimeForm v-model="startTime" />
         </div>
-        <span class="px-2">-</span>
+        <span class="px-2">–</span>
         <DateForm v-model="endDate" :isError="isInvalidDatetime" />
         <div v-show="!allDay">
           <TimeForm v-model="endTime" :isError="isInvalidDatetime" />
@@ -44,7 +44,6 @@
 import { mapGetters, mapActions } from 'vuex';
 import { validationMixin } from 'vuelidate';
 import { required } from 'vuelidate/lib/validators';
-
 import DialogSection from '../layouts/DialogSection';
 import DateForm from '../forms/DateForm';
 import TimeForm from '../forms/TimeForm';
@@ -53,7 +52,6 @@ import ColorForm from '../forms/ColorForm';
 import CheckBox from '../forms/CheckBox';
 import CalendarSelectForm from '../forms/CalendarSelectForm';
 import { isGreaterEndThanStart } from '../../functions/datetime';
-
 export default {
   name: 'EventFormDialog',
   mixins: [validationMixin],
@@ -106,13 +104,8 @@ export default {
   methods: {
     ...mapActions('events', ['setEvent', 'setEditMode', 'createEvent', 'updateEvent']),
     closeDialog() {
-      this.setEvent(null);
-    },
-    cancel() {
       this.setEditMode(false);
-      if (!this.event.id) {
-        this.setEvent(null);
-      }
+      this.setEvent(null);
     },
     submit() {
       if (this.isInvalid) {
@@ -121,8 +114,8 @@ export default {
       const params = {
         ...this.event,
         name: this.name,
-        start: `${this.startDate} ${this.startTime || ''} `,
-        end: `${this.endDate} ${this.endTime || ''} `,
+        start: `${this.startDate} ${this.startTime || ''}`,
+        end: `${this.endDate} ${this.endTime || ''}`,
         description: this.description,
         color: this.color,
         timed: !this.allDay,
@@ -134,6 +127,12 @@ export default {
         this.createEvent(params);
       }
       this.closeDialog();
+    },
+    cancel() {
+      this.setEditMode(false);
+      if (!this.event.id) {
+        this.setEvent(null);
+      }
     },
     changeCalendar(calendar) {
       this.color = calendar.color;

@@ -35,7 +35,6 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import DialogSection from '../layouts/DialogSection';
-
 export default {
   name: 'EventDetailDialog',
   components: {
@@ -47,7 +46,6 @@ export default {
   methods: {
     ...mapActions('events', ['setEvent', 'deleteEvent', 'setEditMode']),
     closeDialog() {
-      this.setEditMode(false);
       this.setEvent(null);
     },
     del() {

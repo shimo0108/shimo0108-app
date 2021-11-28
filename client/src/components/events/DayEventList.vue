@@ -26,7 +26,6 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import { formatDateToJa } from '../../functions/datetime';
-
 export default {
   name: 'DayEventList',
   computed: {
