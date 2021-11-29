@@ -1,12 +1,14 @@
 package models
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/labstack/echo"
 	"github.com/pkg/errors"
+	"github.com/shimo0108/task_list/server/models"
 )
 
 type Event struct {
@@ -21,35 +23,41 @@ type Event struct {
 	CreatedAt   time.Time `json:"created_at" form:"created_at"`
 }
 
-func CreateEvent() echo.HandlerFunc {
-	return func(c echo.Context) error {
+func (e *Event) CreateEvent(db *sql.DB) (err error) {
+	cmd := `insert into events (name, start_time, end_time, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8)`
 
-		cmd := `insert into events (name, start_time, end_time, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8)`
-
-		_, err = Db.Exec(cmd,
-			c.FormValue("name"),
-			c.FormValue("start"),
-			c.FormValue("end"),
-			c.FormValue("calendar_id"),
-			c.FormValue("timed"),
-			c.FormValue("description"),
-			c.FormValue("color"),
-			time.Now())
-		if err != nil {
-			log.Fatalln(err)
-		}
-		e := &Event{
-			Name:        c.FormValue("name"),
-			StartTime:   stringToTime(c.FormValue("start")),
-			EndTime:     stringToTime(c.FormValue("end")),
-			CalendarId:  stringToInt(c.FormValue("calendar_id")),
-			Timed:       stringToBool(c.FormValue("timed")),
-			Description: c.FormValue("description"),
-			Color:       c.FormValue("color"),
-		}
-
-		return c.JSON(http.StatusOK, e)
+	_, err = db.Exec(cmd,
+		e.Name,
+		e.StartTime,
+		e.EndTime,
+		e.CalendarId,
+		e.Timed,
+		e.Description,
+		e.Color,
+		time.Now())
+	if err != nil {
+		log.Fatalln(err)
 	}
+	return err
+}
+
+func (e *Event) UpdateEvent(db *sql.DB) (err error) {
+	cmd := `update events set name = $1 ,start_time = $2 ,end_time = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`
+
+	_, err = db.Exec(cmd,
+		e.Name,
+		e.StartTime,
+		e.EndTime,
+		e.CalendarId,
+		e.Timed,
+		e.Description,
+		e.Color,
+		e.Id)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	return err
 }
 
 func GetEvents() echo.HandlerFunc {
@@ -57,7 +65,7 @@ func GetEvents() echo.HandlerFunc {
 		event := Event{}
 		events := []*Event{}
 
-		rows, err := Db.Query("select id, name, start_time, end_time, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
+		rows, err := models.Db.Query("select id, name, start_time, end_time, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
 		if err != nil {
 			return errors.Wrapf(err, "cannot connect SQL")
 		}
@@ -83,46 +91,12 @@ func GetEvents() echo.HandlerFunc {
 	}
 }
 
-func UpdateEvent() echo.HandlerFunc {
-	return func(c echo.Context) error {
-
-		cmd := `update events set name = $1 ,start_time = $2 ,end_time = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`
-
-		_, err = Db.Exec(cmd,
-			c.FormValue("name"),
-			c.FormValue("start_time"),
-			c.FormValue("end_time"),
-			c.FormValue("calendar_id"),
-			c.FormValue("timed"),
-			c.FormValue("description"),
-			c.FormValue("color"),
-			c.Param("id"))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		e := &Event{
-			Id:          stringToInt(c.Param("id")),
-			Name:        c.FormValue("name"),
-			StartTime:   stringToTime(c.FormValue("start_time")),
-			EndTime:     stringToTime(c.FormValue("end_time")),
-			CalendarId:  stringToInt(c.FormValue("calendar_id")),
-			Timed:       stringToBool(c.FormValue("timed")),
-			Description: c.FormValue("description"),
-			Color:       c.FormValue("color"),
-		}
-
-		return c.JSON(http.StatusOK, e)
+func (e *Event) DeleteEvent(db *sql.DB) (err error) {
+	cmd := `delete from events where id = $1`
+	_, err = db.Exec(cmd, e.Id)
+	if err != nil {
+		log.Fatalln(err)
 	}
-}
 
-func DeleteEvent() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		cmd := `delete from events where id = $1`
-		_, err = Db.Exec(cmd, c.Param("id"))
-		if err != nil {
-			log.Fatalln(err)
-		}
-
-		return c.JSON(http.StatusOK, "success")
-	}
+	return err
 }

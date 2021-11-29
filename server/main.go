@@ -1,12 +1,21 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/shimo0108/shimo0108-app/server/handler"
 	"github.com/shimo0108/shimo0108-app/server/models"
 )
 
 func main() {
+	router := NewRouter()
+
+	router.Start(":9999")
+}
+
+func NewRouter() *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
@@ -14,18 +23,23 @@ func main() {
 
 	initRouting(e)
 
-	e.Start(":9999")
+	return e
 }
 
 func initRouting(e *echo.Echo) {
+	e.GET("/hello", helloHandler)
 	e.GET("/api/v1/events", models.GetEvents())
-	e.POST("/api/v1/events", models.CreateEvent())
-	e.PUT("/api/v1/events/:id", models.UpdateEvent())
-	e.DELETE("/api/v1/events/:id", models.DeleteEvent())
+	e.POST("/api/v1/events", handler.CreateEventHandler())
+	e.PUT("/api/v1/events/:id", handler.UpdateEventHandler())
+	e.DELETE("/api/v1/events/:id", handler.DeleteEventHandler())
 
-	e.GET("/api/v1/calendars/:id", models.GetCalendar())
+	e.GET("/api/v1/calendars/:id", handler.GetCalendarHandler())
 	e.GET("/api/v1/calendars", models.GetCalendars())
-	e.POST("/api/v1/calendars", models.CreateCalendar())
-	e.PUT("/api/v1/calendars/:id", models.UpdateCalendar())
-	e.DELETE("/api/v1/calendars/:id", models.DeleteCalendar())
+	e.POST("/api/v1/calendars", handler.CreateCalendarHandler())
+	e.PUT("/api/v1/calendars/:id", handler.UpdateCalendarHandler())
+	e.DELETE("/api/v1/calendars/:id", handler.DeleteCalendarHandler())
+}
+
+func helloHandler(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, Echo World!!")
 }
