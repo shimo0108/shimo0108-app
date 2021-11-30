@@ -3,12 +3,7 @@ package models
 import (
 	"database/sql"
 	"log"
-	"net/http"
 	"time"
-
-	"github.com/labstack/echo"
-	"github.com/pkg/errors"
-	"github.com/shimo0108/task_list/server/models"
 )
 
 type Calendar struct {
@@ -33,31 +28,30 @@ func GetCalendar(id int, db *sql.DB) (calendar Calendar, err error) {
 	return calendar, err
 }
 
-func GetCalendars() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		calendar := Calendar{}
-		calendars := []*Calendar{}
+func GetCalendars(db *sql.DB) (calendars []*Calendar, err error) {
+	calendar := Calendar{}
+	calendars = []*Calendar{}
 
-		rows, err := models.Db.Query("select id, name, visibility, COALESCE(color,''), created_at from calendars")
-		if err != nil {
-			return errors.Wrapf(err, "cannot connect SQL")
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			if err := rows.Scan(
-				&calendar.Id,
-				&calendar.Name,
-				&calendar.Visibility,
-				&calendar.Color,
-				&calendar.CreatedAt); err != nil {
-				return errors.Wrapf(err, "cannot connect SQL")
-			}
-			calendars = append(calendars, &Calendar{Id: calendar.Id, Name: calendar.Name, Visibility: calendar.Visibility, Color: calendar.Color, CreatedAt: calendar.CreatedAt})
-		}
-
-		return c.JSON(http.StatusOK, calendars)
+	rows, err := db.Query("select id, name, visibility, COALESCE(color,''), created_at from calendars")
+	if err != nil {
+		panic("You can't open DB (dbGetAll())")
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err := rows.Scan(
+			&calendar.Id,
+			&calendar.Name,
+			&calendar.Visibility,
+			&calendar.Color,
+			&calendar.CreatedAt); err != nil {
+			panic("You can't open DB (dbGetAll())")
+		}
+		calendars = append(calendars, &Calendar{Id: calendar.Id, Name: calendar.Name, Visibility: calendar.Visibility, Color: calendar.Color, CreatedAt: calendar.CreatedAt})
+
+	}
+	return calendars, err
+
 }
 
 func (c *Calendar) CreateCalendar(db *sql.DB) (err error) {

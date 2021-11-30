@@ -6,7 +6,6 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/shimo0108/shimo0108-app/server/handler"
-	"github.com/shimo0108/shimo0108-app/server/models"
 )
 
 func main() {
@@ -28,13 +27,13 @@ func NewRouter() *echo.Echo {
 
 func initRouting(e *echo.Echo) {
 	e.GET("/hello", helloHandler)
-	e.GET("/api/v1/events", models.GetEvents())
+	e.GET("/api/v1/events", handler.GetEventsHandler())
 	e.POST("/api/v1/events", handler.CreateEventHandler())
 	e.PUT("/api/v1/events/:id", handler.UpdateEventHandler())
 	e.DELETE("/api/v1/events/:id", handler.DeleteEventHandler())
 
 	e.GET("/api/v1/calendars/:id", handler.GetCalendarHandler())
-	e.GET("/api/v1/calendars", models.GetCalendars())
+	e.GET("/api/v1/calendars", handler.GetCalendarsHandler())
 	e.POST("/api/v1/calendars", handler.CreateCalendarHandler())
 	e.PUT("/api/v1/calendars/:id", handler.UpdateCalendarHandler())
 	e.DELETE("/api/v1/calendars/:id", handler.DeleteCalendarHandler())

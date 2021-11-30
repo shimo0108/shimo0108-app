@@ -3,12 +3,7 @@ package models
 import (
 	"database/sql"
 	"log"
-	"net/http"
 	"time"
-
-	"github.com/labstack/echo"
-	"github.com/pkg/errors"
-	"github.com/shimo0108/task_list/server/models"
 )
 
 type Event struct {
@@ -60,35 +55,33 @@ func (e *Event) UpdateEvent(db *sql.DB) (err error) {
 	return err
 }
 
-func GetEvents() echo.HandlerFunc {
-	return func(c echo.Context) error {
-		event := Event{}
-		events := []*Event{}
+func GetEvents(db *sql.DB) (events []*Event, err error) {
+	event := Event{}
+	events = []*Event{}
 
-		rows, err := models.Db.Query("select id, name, start_time, end_time, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
-		if err != nil {
-			return errors.Wrapf(err, "cannot connect SQL")
-		}
-		defer rows.Close()
-
-		for rows.Next() {
-			if err := rows.Scan(
-				&event.Id,
-				&event.Name,
-				&event.StartTime,
-				&event.EndTime,
-				&event.CalendarId,
-				&event.Timed,
-				&event.Description,
-				&event.Color,
-				&event.CreatedAt); err != nil {
-				return errors.Wrapf(err, "cannot connect SQL")
-			}
-			events = append(events, &Event{Id: event.Id, Name: event.Name, StartTime: event.StartTime, EndTime: event.EndTime, CalendarId: event.CalendarId, Timed: event.Timed, Description: event.Description, Color: event.Color, CreatedAt: event.CreatedAt})
-		}
-
-		return c.JSON(http.StatusOK, events)
+	rows, err := db.Query("select id, name, start_time, end_time, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
+	if err != nil {
+		panic("You can't open DB (dbGetAll())")
 	}
+	defer rows.Close()
+
+	for rows.Next() {
+		if err := rows.Scan(
+			&event.Id,
+			&event.Name,
+			&event.StartTime,
+			&event.EndTime,
+			&event.CalendarId,
+			&event.Timed,
+			&event.Description,
+			&event.Color,
+			&event.CreatedAt); err != nil {
+			panic("You can't open DB (dbGetAll())")
+		}
+		events = append(events, &Event{Id: event.Id, Name: event.Name, StartTime: event.StartTime, EndTime: event.EndTime, CalendarId: event.CalendarId, Timed: event.Timed, Description: event.Description, Color: event.Color, CreatedAt: event.CreatedAt})
+	}
+
+	return events, err
 }
 
 func (e *Event) DeleteEvent(db *sql.DB) (err error) {

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -9,7 +10,10 @@ import (
 
 func GetEventsHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		Events := models.GetEvents()
+		Events, err := models.GetEvents(Db)
+		if err != nil {
+			log.Fatalln(err)
+		}
 
 		return c.JSON(http.StatusOK, Events)
 	}

@@ -18,6 +18,15 @@ func GetCalendarHandler() echo.HandlerFunc {
 	}
 }
 
+func GetCalendarsHandler() echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		calendars, _ := models.GetCalendars(Db)
+
+		return c.JSON(http.StatusOK, calendars)
+	}
+}
+
 func CreateCalendarHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ca := &models.Calendar{}
