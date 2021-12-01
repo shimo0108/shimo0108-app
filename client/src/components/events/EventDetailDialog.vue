@@ -18,7 +18,7 @@
     </v-card-title>
     <v-card-text>
       <DialogSection icon="mdi-clock-time-three-outline">
-        {{ event.startDate }} {{ event.timed ? event.startTime : '' }} ~ {{ event.endDate }} {{ event.timed ? event.endTime : '' }}
+        {{ event.start.toLocaleString() }} ~ {{ event.end.toLocaleString() }}
       </DialogSection>
     </v-card-text>
     <v-card-text>
@@ -26,15 +26,13 @@
         {{ event.description || 'no description' }}
       </DialogSection>
     </v-card-text>
-    <v-card-text>
-      <DialogSection icon="mdi-calendar">{{ event.calendar.name }}</DialogSection>
-    </v-card-text>
   </v-card>
 </template>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import DialogSection from '../layouts/DialogSection';
+
 export default {
   name: 'EventDetailDialog',
   components: {

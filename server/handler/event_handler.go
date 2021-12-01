@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -23,14 +24,18 @@ func CreateEventHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		e := &models.Event{}
 		e.Name = c.FormValue("name")
-		e.StartTime = StringToTime(c.FormValue("start"))
-		e.EndTime = StringToTime(c.FormValue("end"))
+		e.StartedAt = StringToTime(c.FormValue("start"))
+		e.EndedAt = StringToTime(c.FormValue("end"))
 		e.CalendarId = stringToInt(c.FormValue("calendar_id"))
 		e.Timed = stringToBool(c.FormValue("timed"))
 		e.Description = c.FormValue("description")
 		e.Color = c.FormValue("color")
 
-		e.CreateEvent(Db)
+		id, err := e.CreateEvent(Db)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		e.Id = int(id)
 
 		return c.JSON(http.StatusOK, e)
 	}
@@ -38,11 +43,13 @@ func CreateEventHandler() echo.HandlerFunc {
 
 func UpdateEventHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		fmt.Println(c.FormValue("start"))
+		fmt.Println(c.FormValue("end"))
 		e := &models.Event{}
 		e.Id = stringToInt(c.Param("id"))
 		e.Name = c.FormValue("name")
-		e.StartTime = StringToTime(c.FormValue("start"))
-		e.EndTime = StringToTime(c.FormValue("end"))
+		e.StartedAt = StringToTime(c.FormValue("start"))
+		e.EndedAt = StringToTime(c.FormValue("end"))
 		e.CalendarId = stringToInt(c.FormValue("calendar_id"))
 		e.Timed = stringToBool(c.FormValue("timed"))
 		e.Description = c.FormValue("description")
@@ -57,7 +64,12 @@ func DeleteEventHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		e := &models.Event{}
 		e.Id = stringToInt(c.Param("id"))
-		e.DeleteEvent(Db)
+
+		id, err := e.DeleteEvent(Db)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		e.Id = int(id)
 
 		return c.JSON(http.StatusOK, e)
 	}

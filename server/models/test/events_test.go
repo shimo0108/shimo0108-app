@@ -1,6 +1,7 @@
 package test
 
 import (
+	"log"
 	"regexp"
 	"testing"
 
@@ -16,17 +17,18 @@ func TestCreateEvent(t *testing.T) {
 			// Arrange
 			e := &models.Event{}
 
+			var id int = 1
 			name := "Goの勉強"
 			color := "red"
-			start_time := stringToTime("2006-01-02 15:04:05")
-			end_time := stringToTime("2006-01-02 15:04:05")
+			started_at := stringToTime("2006-01-02 15:04:05")
+			ended_at := stringToTime("2006-01-02 15:04:05")
 			calendar_id := 3
 			timed := true
 			description := "テストを書く"
 
 			e.Name = name
-			e.StartTime = start_time
-			e.EndTime = end_time
+			e.StartedAt = started_at
+			e.EndedAt = ended_at
 			e.CalendarId = calendar_id
 			e.Timed = timed
 			e.Description = description
@@ -36,24 +38,27 @@ func TestCreateEvent(t *testing.T) {
 				t.Error(err.Error())
 			}
 			defer db.Close()
-			mock.ExpectExec(regexp.QuoteMeta("insert into events (name, start_time, end_time, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8)")).
-				WithArgs(name, start_time, end_time, calendar_id, timed, description, color, AnyTime{}).
-				WillReturnResult(sqlmock.NewResult(1, 1))
+			columns := []string{"id"}
 
-			e.CreateEvent(db)
+			mock.ExpectQuery(regexp.QuoteMeta(`insert into events (name, started_at, ended_at, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8) RETURNING id`)).
+				WithArgs(name, started_at, ended_at, calendar_id, timed, description, color, AnyTime{}).
+				WillReturnRows(sqlmock.NewRows(columns).AddRow(id))
+
+			res, err := e.CreateEvent(db)
+			if err != nil {
+				log.Fatalln(err)
+			}
 
 			assert.Equal(t, err, nil)
+			assert.Equal(t, res, id)
 			assert.Equal(t, e.Name, name)
-			assert.Equal(t, e.StartTime, start_time)
-			assert.Equal(t, e.EndTime, end_time)
+			assert.Equal(t, e.StartedAt, started_at)
+			assert.Equal(t, e.EndedAt, ended_at)
 			assert.Equal(t, e.CalendarId, calendar_id)
 			assert.Equal(t, e.Timed, timed)
 			assert.Equal(t, e.Description, description)
 			assert.Equal(t, e.Color, color)
 
-			if err != nil {
-				t.Error(err.Error())
-			}
 		},
 	)
 }
@@ -68,16 +73,16 @@ func TestUpdateEvent(t *testing.T) {
 			id := 1
 			name := "Goの勉強"
 			color := "red"
-			start_time := stringToTime("2006-01-02 15:04:05")
-			end_time := stringToTime("2006-01-02 15:04:05")
+			started_at := stringToTime("2006-01-02 15:04:05")
+			ended_at := stringToTime("2006-01-02 15:04:05")
 			calendar_id := 3
 			timed := true
 			description := "テストを書く"
 
 			e.Id = id
 			e.Name = name
-			e.StartTime = start_time
-			e.EndTime = end_time
+			e.StartedAt = started_at
+			e.EndedAt = ended_at
 			e.CalendarId = calendar_id
 			e.Timed = timed
 			e.Description = description
@@ -87,8 +92,8 @@ func TestUpdateEvent(t *testing.T) {
 				t.Error(err.Error())
 			}
 			defer db.Close()
-			mock.ExpectExec(regexp.QuoteMeta(`update events set name = $1 ,start_time = $2 ,end_time = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`)).
-				WithArgs(name, start_time, end_time, calendar_id, timed, description, color, id).
+			mock.ExpectExec(regexp.QuoteMeta(`update events set name = $1 ,started_at = $2 ,ended_at = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`)).
+				WithArgs(name, started_at, ended_at, calendar_id, timed, description, color, id).
 				WillReturnResult(sqlmock.NewResult(1, 1))
 
 			e.UpdateEvent(db)
@@ -96,8 +101,8 @@ func TestUpdateEvent(t *testing.T) {
 			assert.Equal(t, err, nil)
 			assert.Equal(t, e.Id, id)
 			assert.Equal(t, e.Name, name)
-			assert.Equal(t, e.StartTime, start_time)
-			assert.Equal(t, e.EndTime, end_time)
+			assert.Equal(t, e.StartedAt, started_at)
+			assert.Equal(t, e.EndedAt, ended_at)
 			assert.Equal(t, e.CalendarId, calendar_id)
 			assert.Equal(t, e.Timed, timed)
 			assert.Equal(t, e.Description, description)
@@ -124,17 +129,19 @@ func TestDeleteEvent(t *testing.T) {
 				t.Error(err.Error())
 			}
 			defer db.Close()
-			mock.ExpectExec(regexp.QuoteMeta(`delete from events where id = $1`)).
+			columns := []string{"id"}
+			mock.ExpectQuery(regexp.QuoteMeta(`delete from events where id = $1`)).
 				WithArgs(id).
-				WillReturnResult(sqlmock.NewResult(1, 1))
+				WillReturnRows(sqlmock.NewRows(columns).AddRow(id))
 
-			e.DeleteEvent(db)
+			res, err := e.DeleteEvent(db)
+			if err != nil {
+				log.Fatalln(err)
+			}
 
 			assert.Equal(t, err, nil)
+			assert.Equal(t, res, id)
 
-			if err != nil {
-				t.Error(err.Error())
-			}
 		},
 	)
 }

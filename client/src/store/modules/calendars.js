@@ -5,6 +5,7 @@ import qs from 'qs';
 const apiUrl = 'http://localhost:9999';
 const formHeader = { headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 
+
 const state = {
   calendars: [],
   calendar: null,
@@ -29,18 +30,18 @@ const actions = {
     commit('setCalendars', response.data);
   },
   async createCalendar({ commit }, calendar) {
+    console.log(calendar)
     const response = await axios.post(`${apiUrl}/api/v1/calendars`, qs.stringify(calendar), formHeader);
     commit('appendCalendar', response.data);
   },
-  async updateCalendar({ dispatch, commit }, calendar) {
+  async updateCalendar({ commit }, calendar) {
     const response = await axios.put(`${apiUrl}/api/v1/calendars/${calendar.id}`, qs.stringify(calendar), formHeader);
     commit('updateCalendar', response.data);
-    dispatch('events/fetchEvents', null, { root: true });
   },
-  async deleteCalendar({ dispatch, commit }, id) {
+  async deleteCalendar({ commit }, id) {
+    console.log(id)
     const response = await axios.delete(`${apiUrl}/api/v1/calendars/${id}`);
     commit('removeCalendar', response.data);
-    dispatch('events/fetchEvents', null, { root: true });
   },
   setCalendar({ commit }, calendar) {
     commit('setCalendar', calendar);

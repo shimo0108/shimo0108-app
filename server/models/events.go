@@ -9,8 +9,8 @@ import (
 type Event struct {
 	Id          int       `json:"id" form:"id"`
 	Name        string    `json:"name" form:"name"`
-	StartTime   time.Time `json:"start_time" form:"start"`
-	EndTime     time.Time `json:"end_time" form:"end"`
+	StartedAt   time.Time `json:"started_at" form:"start"`
+	EndedAt     time.Time `json:"ended_at" form:"end"`
 	CalendarId  int       `json:"calendar_id" form:"calendar_id"`
 	Timed       bool      `json:"timed" form:"timed"`
 	Description string    `json:"description" form:"description"`
@@ -18,31 +18,32 @@ type Event struct {
 	CreatedAt   time.Time `json:"created_at" form:"created_at"`
 }
 
-func (e *Event) CreateEvent(db *sql.DB) (err error) {
-	cmd := `insert into events (name, start_time, end_time, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8)`
+func (e *Event) CreateEvent(db *sql.DB) (id int, err error) {
+	cmd := `insert into events (name, started_at, ended_at, calendar_id, timed, description, color, created_at) values ($1, $2, $3, $4, $5, $6 ,$7, $8) RETURNING id`
 
-	_, err = db.Exec(cmd,
+	err = db.QueryRow(cmd,
 		e.Name,
-		e.StartTime,
-		e.EndTime,
+		e.StartedAt,
+		e.EndedAt,
 		e.CalendarId,
 		e.Timed,
 		e.Description,
 		e.Color,
-		time.Now())
+		time.Now()).Scan(&id)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return err
+
+	return id, err
 }
 
 func (e *Event) UpdateEvent(db *sql.DB) (err error) {
-	cmd := `update events set name = $1 ,start_time = $2 ,end_time = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`
+	cmd := `update events set name = $1 ,started_at = $2 ,ended_at = $3 ,calendar_id = $4 ,timed = $5 ,description = $6 ,color = $7 where id = $8`
 
 	_, err = db.Exec(cmd,
 		e.Name,
-		e.StartTime,
-		e.EndTime,
+		e.StartedAt,
+		e.EndedAt,
 		e.CalendarId,
 		e.Timed,
 		e.Description,
@@ -59,7 +60,7 @@ func GetEvents(db *sql.DB) (events []*Event, err error) {
 	event := Event{}
 	events = []*Event{}
 
-	rows, err := db.Query("select id, name, start_time, end_time, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
+	rows, err := db.Query("select id, name, started_at, ended_at, calendar_id, timed, COALESCE(description,''), COALESCE(color,''), created_at from events")
 	if err != nil {
 		panic("You can't open DB (dbGetAll())")
 	}
@@ -69,8 +70,8 @@ func GetEvents(db *sql.DB) (events []*Event, err error) {
 		if err := rows.Scan(
 			&event.Id,
 			&event.Name,
-			&event.StartTime,
-			&event.EndTime,
+			&event.StartedAt,
+			&event.EndedAt,
 			&event.CalendarId,
 			&event.Timed,
 			&event.Description,
@@ -78,18 +79,18 @@ func GetEvents(db *sql.DB) (events []*Event, err error) {
 			&event.CreatedAt); err != nil {
 			panic("You can't open DB (dbGetAll())")
 		}
-		events = append(events, &Event{Id: event.Id, Name: event.Name, StartTime: event.StartTime, EndTime: event.EndTime, CalendarId: event.CalendarId, Timed: event.Timed, Description: event.Description, Color: event.Color, CreatedAt: event.CreatedAt})
+		events = append(events, &Event{Id: event.Id, Name: event.Name, StartedAt: event.StartedAt, EndedAt: event.EndedAt, CalendarId: event.CalendarId, Timed: event.Timed, Description: event.Description, Color: event.Color, CreatedAt: event.CreatedAt})
 	}
 
 	return events, err
 }
 
-func (e *Event) DeleteEvent(db *sql.DB) (err error) {
-	cmd := `delete from events where id = $1`
-	_, err = db.Exec(cmd, e.Id)
+func (e *Event) DeleteEvent(db *sql.DB) (id int, err error) {
+	cmd := `delete from events where id = $1 RETURNING id`
+	err = db.QueryRow(cmd, e.Id).Scan(&id)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return err
+	return id, err
 }

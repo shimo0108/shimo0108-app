@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"log"
 	"regexp"
 	"testing"
 
@@ -50,6 +51,7 @@ func TestCreateCalendar(t *testing.T) {
 		func(t *testing.T) {
 			// Arrange
 			ca := &models.Calendar{}
+			var id int = 1
 
 			name := "予定"
 			visibility := true
@@ -63,20 +65,23 @@ func TestCreateCalendar(t *testing.T) {
 				t.Error(err.Error())
 			}
 			defer db.Close()
-			mock.ExpectExec(regexp.QuoteMeta("insert into calendars (name, visibility, color, created_at) values ($1, $2, $3, $4)")).
-				WithArgs(name, visibility, color, AnyTime{}).
-				WillReturnResult(sqlmock.NewResult(1, 1))
+			columns := []string{"id"}
 
-			ca.CreateCalendar(db)
+			mock.ExpectQuery(regexp.QuoteMeta(`insert into calendars (name, visibility, color, created_at) values ($1, $2, $3, $4) RETURNING id`)).
+				WithArgs(name, visibility, color, AnyTime{}).
+				WillReturnRows(sqlmock.NewRows(columns).AddRow(id))
+
+			res, err := ca.CreateCalendar(db)
+			if err != nil {
+				log.Fatalln(err)
+			}
 
 			assert.Equal(t, err, nil)
+			assert.Equal(t, res, id)
 			assert.Equal(t, ca.Name, "予定")
 			assert.Equal(t, ca.Visibility, visibility)
 			assert.Equal(t, ca.Color, "red")
 
-			if err != nil {
-				t.Error(err.Error())
-			}
 		},
 	)
 }

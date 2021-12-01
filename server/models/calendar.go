@@ -54,18 +54,18 @@ func GetCalendars(db *sql.DB) (calendars []*Calendar, err error) {
 
 }
 
-func (c *Calendar) CreateCalendar(db *sql.DB) (err error) {
-	cmd := `insert into calendars (name, visibility, color, created_at) values ($1, $2, $3, $4)`
+func (c *Calendar) CreateCalendar(db *sql.DB) (id int, err error) {
+	cmd := `insert into calendars (name, visibility, color, created_at) values ($1, $2, $3, $4) RETURNING id`
 
-	_, err = db.Exec(cmd,
+	err = db.QueryRow(cmd,
 		c.Name,
 		true,
 		c.Color,
-		time.Now())
+		time.Now()).Scan(&id)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	return err
+	return id, err
 }
 
 func (c *Calendar) UpdateCalendar(db *sql.DB) (err error) {

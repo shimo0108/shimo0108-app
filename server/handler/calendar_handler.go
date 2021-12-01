@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -29,10 +31,17 @@ func GetCalendarsHandler() echo.HandlerFunc {
 
 func CreateCalendarHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
+		var id int
 		ca := &models.Calendar{}
 		ca.Name = c.FormValue("name")
+		ca.Visibility = stringToBool(c.FormValue("visibility"))
 		ca.Color = c.FormValue("color")
-		ca.CreateCalendar(Db)
+
+		id, err = ca.CreateCalendar(Db)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		ca.Id = int(id)
 
 		return c.JSON(http.StatusOK, ca)
 	}
@@ -41,11 +50,14 @@ func CreateCalendarHandler() echo.HandlerFunc {
 func UpdateCalendarHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		ca := &models.Calendar{}
+		fmt.Println(c.Param("id"))
 		ca.Id = stringToInt(c.Param("id"))
 		ca.Name = c.FormValue("name")
 		ca.Visibility = stringToBool(c.FormValue("visibility"))
 		ca.Color = c.FormValue("color")
 		ca.UpdateCalendar(Db)
+
+		fmt.Println(ca)
 
 		return c.JSON(http.StatusOK, ca)
 	}
@@ -53,7 +65,9 @@ func UpdateCalendarHandler() echo.HandlerFunc {
 
 func DeleteCalendarHandler() echo.HandlerFunc {
 	return func(c echo.Context) error {
+
 		ca := &models.Calendar{}
+		fmt.Println(c.Param("id"))
 		ca.Id = stringToInt(c.Param("id"))
 		ca.DeleteCalendar(Db)
 

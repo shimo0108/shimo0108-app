@@ -10,8 +10,8 @@ SELECT setval('calendars_id_seq', 4, false);
 create table events (
   id          serial primary key,
   name        varchar(100) not null,
-  start_time  timestamp not null default current_timestamp,
-  end_time    timestamp not null default current_timestamp,
+  started_at  timestamp not null default current_timestamp,
+  ended_at    timestamp not null default current_timestamp,
   calendar_id int,
   timed       boolean default true,
   description varchar(255),
