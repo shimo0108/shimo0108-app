@@ -28,12 +28,16 @@ resource "aws_ecs_task_definition" "app" {
 resource "aws_lb_target_group" "this" {
   name_prefix = "target"
   vpc_id      = var.vpc_id
-  port        = 9999
+  port        = 80
   protocol    = "HTTP"
 
   target_type = "ip"
   lifecycle {
     create_before_destroy = true
+  }
+    health_check {
+    port = 80
+    path = "/test"
   }
 }
 
