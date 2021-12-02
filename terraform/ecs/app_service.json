@@ -1,0 +1,49 @@
+
+[
+  {
+    "name": "server",
+    "image": "844136403748.dkr.ecr.ap-northeast-1.amazonaws.com/shimo0108-app:latest",
+    "essential": true,
+    "command": [
+      "/app"
+    ],
+    "portMappings": [
+      {
+        "hostPort": 9999,
+        "protocol": "tcp",
+        "containerPort": 9999
+      }
+    ],
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-group": "shimo0108-app",
+        "awslogs-region": "ap-northeast-1",
+        "awslogs-stream-prefix": "shimo0108-app-proxy_stream"
+      }
+    },
+
+    "environment": [
+      {
+        "name": "RDS_HOST",
+        "value": "${db_host}"
+      },
+      {
+        "name": "RDS_USER",
+        "value": "${db_user}"
+      },
+      {
+        "name": "RDS_PASSWORD",
+        "value": "${db_password}"
+      },
+      {
+        "name": "RDS_PORT",
+        "value": "5432"
+      },
+      {
+        "name": "RDS_DB_NAME",
+        "value": "${db_name}"
+      }
+    ]
+  }
+]
