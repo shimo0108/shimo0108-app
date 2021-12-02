@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "app" {
 resource "aws_lb_target_group" "this" {
   name_prefix = "target"
   vpc_id      = var.vpc_id
-  port        = 80
+  port        = 9999
   protocol    = "HTTP"
 
   target_type = "ip"

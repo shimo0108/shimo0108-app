@@ -7,14 +7,6 @@ import (
 
 var layout = "2006-01-02 15:04:05"
 
-func init() {
-	jst, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic(err)
-	}
-	time.Local = jst
-}
-
 type Result interface {
 	LastInsertId() (int64, error)
 	RowsAffected() (int64, error)
