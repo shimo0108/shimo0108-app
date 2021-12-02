@@ -14,7 +14,7 @@ CMD ["go", "run", "main.go"]
 
 FROM golang:latest as builder
 
-WORKDIR /go/src/task_list/server
+WORKDIR /go/src/shimo0108-app/server
 
 RUN go get -d -v golang.org/x/net/html
 
