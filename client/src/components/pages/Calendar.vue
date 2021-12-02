@@ -16,7 +16,7 @@
       <v-sheet width="200px">
         <CalendarList />
       </v-sheet>
-      <v-sheet class="flex">
+      <v-sheet class="calendar_sheet">
         <v-calendar
           ref="calendar"
           v-model="value"
@@ -85,3 +85,9 @@ export default {
   },
 };
 </script>
+<style>
+.calendar_sheet{
+  flex: 1;
+}
+
+</style>

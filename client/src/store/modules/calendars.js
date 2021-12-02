@@ -2,7 +2,7 @@ import axios from 'axios';
 import { serializeCalendar } from '../../functions/serializers';
 import qs from 'qs';
 
-const apiUrl = 'http://localhost:9999';
+const apiUrl = 'https://api.shimo0108-app.com:9999';
 const formHeader = { headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 
 
