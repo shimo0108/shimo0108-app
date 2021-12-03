@@ -28,6 +28,3 @@ RUN go get -u github.com/lib/pq
 RUN go get -u google.golang.org/grpc \
     && go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
 ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
-EXPOSE 9999
-CMD ["go", "run", "main.go"]
