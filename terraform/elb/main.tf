@@ -45,19 +45,26 @@ resource "aws_lb_listener" "http" {
 resource "aws_lb_listener" "https" {
   port     = "443"
   protocol = "HTTPS"
+
   load_balancer_arn = aws_lb.this.arn
   certificate_arn   = var.sub_acm_id
+
   default_action {
-    type             = "forward"
-    target_group_arn = var.target_group_arn
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "200"
+      message_body = "ok"
+    }
   }
 }
-
 
 resource "aws_route53_record" "this" {
   type    = "A"
   name    = "api.${var.domain}"
   zone_id = data.aws_route53_zone.this.id
+
   alias {
     name                   = aws_lb.this.dns_name
     zone_id                = aws_lb.this.zone_id
