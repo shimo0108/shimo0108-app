@@ -15,7 +15,7 @@ var Db *sql.DB
 var err error
 
 func init() {
-	str_connect := ("host=postgres user=shimo0108-app.com:5432 dbname=shimo_app_db password=password sslmode=disable")
+	str_connect := ("host=postgres user=localhost:5432 dbname=shimo_app_db password=password sslmode=disable")
 	Db, err = sql.Open("postgres", str_connect)
 	fmt.Println(Db)
 
