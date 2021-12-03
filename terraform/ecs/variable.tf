@@ -23,3 +23,6 @@ variable "alb_security_group_id" {}
 variable "cluster_name" {}
 
 variable "public_subnet_ids" {}
+
+variable "ssm_agent_code" {}
+variable "ssm_agent_id" {}
