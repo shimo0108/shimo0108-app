@@ -45,14 +45,6 @@
       {
         "name": "RDS_DB_NAME",
         "value": "${db_name}"
-      },
-      {
-        "name": "SSM_AGENT_CODE",
-        "value": "${ssm_agent_code}"
-      },
-      {
-        "name": "SSM_AGENT_ID",
-        "value": "${ssm_agent_id}"
       }
     ]
   }

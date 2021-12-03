@@ -56,8 +56,6 @@ module "ecs" {
   db_user        = var.db_user
   db_password    = var.db_password
   db_host        = module.rds.db_address
-  ssm_agent_code = module.ssm_activation.ssm_agent_code # SSM Agent Code
-  ssm_agent_id   = module.ssm_activation.ssm_agent_id   # SSM Agent ID
 
   vpc_id                = module.network.vpc_id
   http_listener_arn     = module.elb.http_listener_arn
@@ -65,9 +63,4 @@ module "ecs" {
   alb_security_group_id = module.elb.alb_security_group_id
   cluster_name          = module.ecs_cluster.cluster_name
   public_subnet_ids     = module.network.public_subnet_ids
-}
-
-module "ssm_activation" {
-  source = "./ssm_activation"
-  app_name = var.app_name
 }

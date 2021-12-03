@@ -23,7 +23,5 @@ data "template_file" "app_container_definitions" {
     db_user     = var.db_user
     db_password = var.db_password
     db_name     = var.db_name
-    ssm_agent_code = var.ssm_agent_code
-    ssm_agent_id   = var.ssm_agent_id
   }
 }
