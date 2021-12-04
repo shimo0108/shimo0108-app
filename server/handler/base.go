@@ -19,7 +19,7 @@ const (
 	DATABASE = "shimo_app_db"
 	USER     = "shimo0108"
 	PASSWORD = "password"
-	PORT     = 5432
+	PORT     = "5432"
 )
 
 func init() {
