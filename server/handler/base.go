@@ -15,15 +15,14 @@ var Db *sql.DB
 var err error
 
 const (
-	HOST     = "terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com"
+	HOST     = "terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com:5432"
 	DATABASE = "shimo_app_db"
 	USER     = "shimo0108"
 	PASSWORD = "password"
-	PORT     = "5432"
 )
 
 func init() {
-	var connectionString string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", HOST, PORT, USER, PASSWORD, DATABASE)
+	var connectionString string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", HOST, USER, PASSWORD, DATABASE)
 	Db, err = sql.Open("postgres", connectionString)
 	fmt.Println(Db)
 
