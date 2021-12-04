@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 	"time"
 
@@ -15,8 +16,14 @@ var Db *sql.DB
 var err error
 
 func init() {
-	str_connect := ("host=postgres user=shimo0108 port=5432 dbname=shimo_app_db password=password sslmode=disable")
-	Db, err = sql.Open("postgres", str_connect)
+	USER := os.Getenv("RDS_USER")
+	PASS := os.Getenv("RDS_PASSWORD")
+	PROTOCOL := "tcp(" + os.Getenv("RDS_HOST") + ":5432)"
+	DBNAME := os.Getenv("RDS_DB_NAME")
+
+	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "sslmode=disable"
+
+	Db, err = sql.Open("postgres", CONNECT)
 	fmt.Println(Db)
 
 	if err != nil {
