@@ -22,7 +22,7 @@ const (
 )
 
 func init() {
-	var connectionString string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", HOST, USER, PASSWORD, DATABASE)
+	var connectionString string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", HOST, USER, PASSWORD, DATABASE)
 	Db, err = sql.Open("postgres", connectionString)
 	fmt.Println(Db)
 
