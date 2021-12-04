@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"os"
 	"strconv"
 	"time"
 
@@ -15,15 +14,21 @@ var Db *sql.DB
 
 var err error
 
+const (
+	HOST     = "terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com:5432"
+	DATABASE = "shimo_app_db"
+	USER     = "shimo0108"
+	PASSWORD = "password"
+)
+
+type Sale struct {
+	Loginid  string
+	Password string
+}
+
 func init() {
-	USER := os.Getenv("RDS_USER")
-	PASS := os.Getenv("RDS_PASSWORD")
-	PROTOCOL := "tcp(" + os.Getenv("RDS_HOST") + ":5432)"
-	DBNAME := os.Getenv("RDS_DB_NAME")
-
-	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "sslmode=disable"
-
-	Db, err = sql.Open("postgres", CONNECT)
+	var connectionString string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", HOST, USER, PASSWORD, DATABASE)
+	Db, err = sql.Open("postgres", connectionString)
 	fmt.Println(Db)
 
 	if err != nil {
