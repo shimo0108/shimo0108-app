@@ -15,7 +15,7 @@ var Db *sql.DB
 var err error
 
 const (
-	HOST     = "terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com:5432"
+	HOST     = "terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com"
 	DATABASE = "shimo_app_db"
 	USER     = "shimo0108"
 	PASSWORD = "password"
