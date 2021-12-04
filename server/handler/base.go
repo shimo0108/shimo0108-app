@@ -19,10 +19,11 @@ const (
 	DATABASE = "shimo_app_db"
 	USER     = "shimo0108"
 	PASSWORD = "password"
+	PORT     = 5432
 )
 
 func init() {
-	var connectionString string = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable", HOST, USER, PASSWORD, DATABASE)
+	var connectionString string = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", HOST, PORT, USER, PASSWORD, DATABASE)
 	Db, err = sql.Open("postgres", connectionString)
 	fmt.Println(Db)
 
