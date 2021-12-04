@@ -16,7 +16,7 @@ var err error
 
 func init() {
 	var connectionString string = `
-	  host=terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com:5432
+	  host=terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com
 		user=shimo0108
 		password=password
 		dbname=shimo_app_db
