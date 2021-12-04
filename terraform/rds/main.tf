@@ -1,13 +1,5 @@
 resource "aws_security_group" "this" {
-  name = "postgres"
   vpc_id = var.vpc_id
-
-  ingress {
-        from_port = 5432
-        to_port = 5432
-        protocol = "tcp"
-        cidr_blocks = ["10.0.1.0/24"]
-  }
 
   egress {
     from_port   = 0
@@ -21,6 +13,24 @@ resource "aws_security_group" "this" {
   }
 }
 
+resource "aws_security_group_rule" "this" {
+  security_group_id = aws_security_group.this.id
+
+  type = "ingress"
+
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = var.alb_security_group_id
+}
+
+resource "aws_db_subnet_group" "this" {
+  name        = var.db_name
+  description = "db subent group of ${var.db_name}"
+  subnet_ids  = var.private_subnet_ids
+}
+
+
 resource "aws_db_instance" "this" {
   allocated_storage    = 10
   engine               = "postgres"
@@ -31,24 +41,8 @@ resource "aws_db_instance" "this" {
   password             = var.db_password
   skip_final_snapshot  = true
 
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+
   vpc_security_group_ids = [aws_security_group.this.id]
   db_subnet_group_name   = aws_db_subnet_group.this.name
-}
-
-
-resource "aws_db_subnet_group" "this" {
-  name        = var.db_name
-  description = "db subent group of ${var.db_name}"
-  subnet_ids  = var.private_subnet_ids
-}
-
-resource "aws_db_parameter_group" "this" {
-    name = "postgres"
-    family = "postgres11"
-    description = "test"
-
-    parameter {
-        name = "log_min_duration_statement"
-        value = "100"
-    }
 }
