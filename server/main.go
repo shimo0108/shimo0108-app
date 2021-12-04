@@ -26,7 +26,7 @@ func NewRouter() *echo.Echo {
 }
 
 func initRouting(e *echo.Echo) {
-	e.GET("/hello", helloHandler)
+	e.GET("/test", helloHandler)
 	e.GET("/api/v1/events", handler.GetEventsHandler())
 	e.POST("/api/v1/events", handler.CreateEventHandler())
 	e.PUT("/api/v1/events/:id", handler.UpdateEventHandler())
@@ -40,5 +40,5 @@ func initRouting(e *echo.Echo) {
 }
 
 func helloHandler(c echo.Context) error {
-	return c.String(http.StatusOK, "Hello, Echo World!!")
+	return c.String(http.StatusOK, "test success")
 }

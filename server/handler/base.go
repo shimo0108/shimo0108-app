@@ -15,12 +15,57 @@ var Db *sql.DB
 var err error
 
 func init() {
-	str_connect := ("host=postgres user=shimo0108 dbname=shimo_app_db password=password sslmode=disable")
-	Db, err = sql.Open("postgres", str_connect)
+	var connectionString string = `
+	  host=terraform-20211202131712468600000007.chsdgfmwm1wv.ap-northeast-1.rds.amazonaws.com
+		user=shimo0108
+		password=password
+		dbname=shimo_app_db
+		sslmode=disable`
+	Db, err = sql.Open("postgres", connectionString)
 	fmt.Println(Db)
 
 	if err != nil {
 		log.Fatal(err)
+	}
+	_, err = Db.Exec("drop table calendars")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	_, err = Db.Exec("drop table events")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	calendars_cmd := `create table calendars (
+		id          serial primary key,
+		name        varchar(100) not null,
+		visibility  boolean default true,
+		color       varchar(16),
+		created_at  timestamp not null default current_timestamp)`
+	fmt.Println(calendars_cmd)
+
+	_, err = Db.Exec(calendars_cmd)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	events_cmd := `create table events (
+		id          serial primary key,
+		name        varchar(100) not null,
+		started_at  timestamp not null default current_timestamp,
+		ended_at    timestamp not null default current_timestamp,
+		calendar_id int,
+		timed       boolean default true,
+		description varchar(255),
+		color       varchar(16),
+		created_at  timestamp not null default current_timestamp,
+		foreign key(calendar_id) references calendars(id))`
+	fmt.Println(events_cmd)
+
+	_, err = Db.Exec(events_cmd)
+	if err != nil {
+		fmt.Println(err)
 	}
 	return
 }
