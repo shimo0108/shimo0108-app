@@ -6,7 +6,12 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "prettier": "prettier --write './src/**/*.{vue,js}'"
+    "prettier": "prettier --write './src/**/*.{vue,js}'",
+    "local-serve": "vue-cli-service serve --mode local",
+    "dev-serve": "vue-cli-service serve --mode development",
+    "prod-serve": "vue-cli-service serve --mode production",
+    "dev-build": "vue-cli-service build --mode development",
+    "prod-build": "vue-cli-service build --mode production"
   },
   "dependencies": {
     "axios": "^0.24.0",

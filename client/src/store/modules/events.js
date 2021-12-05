@@ -2,7 +2,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import qs from 'qs';
 
-const apiUrl = 'https://api.shimo0108-app.com';
+const apiUrl = process.env.VUE_APP_API_BASE_URL;
 const formHeader = { headers: { 'content-type': 'application/x-www-form-urlencoded' } };
 
 const state = {
@@ -49,29 +49,30 @@ const mutations = {
 
 const actions = {
   async fetchEvents({ commit }) {
-    const response = await axios.get(`${apiUrl}/api/v1/events`);
+    console.log(apiUrl)
+    const response = await axios.get(`${apiUrl}/events`);
 
     commit('setEvents', response.data); // mutationを呼び出す
   },
   async createEvent({ commit }, event) {
     event.start = format(new Date(event.start.toString() + ':00'), 'yyyy-MM-dd HH:mm:00');
     event.end = format(new Date(event.end.toString() + ':00'), 'yyyy-MM-dd HH:mm:00');
-    const response = await axios.post(`${apiUrl}/api/v1/events`, qs.stringify(event), formHeader);
+    const response = await axios.post(`${apiUrl}/events`, qs.stringify(event), formHeader);
     response.data.started_at = response.data.started_at.replace(/Z$/, '+09:00');
     response.data.ended_at = response.data.ended_at.replace(/Z$/, '+09:00');
-    console.log(response.data)
+    console.log(response.data);
     commit('appendEvent', response.data);
   },
   async updateEvent({ commit }, event) {
     event.start = format(new Date(event.start.toString() + ':00'), 'yyyy-MM-dd HH:mm:00');
     event.end = format(new Date(event.end.toString() + ':00'), 'yyyy-MM-dd HH:mm:00');
-    const response = await axios.put(`${apiUrl}/api/v1/events/${event.id}`, qs.stringify(event), formHeader);
+    const response = await axios.put(`${apiUrl}/events/${event.id}`, qs.stringify(event), formHeader);
     response.data.started_at = response.data.started_at.replace(/Z$/, '+09:00');
     response.data.ended_at = response.data.ended_at.replace(/Z$/, '+09:00');
     commit('updateEvent', response.data);
   },
   async deleteEvent({ commit }, id) {
-    const response = await axios.delete(`${apiUrl}/api/v1/events/${id}`);
+    const response = await axios.delete(`${apiUrl}/events/${id}`);
     commit('removeEvent', response.date);
     commit('resetEvent');
   },

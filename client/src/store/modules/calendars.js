@@ -2,9 +2,8 @@ import axios from 'axios';
 import { serializeCalendar } from '../../functions/serializers';
 import qs from 'qs';
 
-const apiUrl = 'https://api.shimo0108-app.com';
+const apiUrl = process.env.VUE_APP_API_BASE_URL;
 const formHeader = { headers: { 'content-type': 'application/x-www-form-urlencoded' } };
-
 
 const state = {
   calendars: [],
@@ -26,21 +25,20 @@ const mutations = {
 
 const actions = {
   async fetchCalendars({ commit }) {
-    const response = await axios.get(`${apiUrl}/api/v1/calendars`);
+    const response = await axios.get(`${apiUrl}/calendars`);
     commit('setCalendars', response.data);
   },
   async createCalendar({ commit }, calendar) {
-    console.log(calendar)
-    const response = await axios.post(`${apiUrl}/api/v1/calendars`, qs.stringify(calendar), formHeader);
+    const response = await axios.post(`${apiUrl}/calendars`, qs.stringify(calendar), formHeader);
     commit('appendCalendar', response.data);
   },
   async updateCalendar({ commit }, calendar) {
-    const response = await axios.put(`${apiUrl}/api/v1/calendars/${calendar.id}`, qs.stringify(calendar), formHeader);
+    const response = await axios.put(`${apiUrl}/calendars/${calendar.id}`, qs.stringify(calendar), formHeader);
     commit('updateCalendar', response.data);
   },
   async deleteCalendar({ commit }, id) {
-    console.log(id)
-    const response = await axios.delete(`${apiUrl}/api/v1/calendars/${id}`);
+    console.log(id);
+    const response = await axios.delete(`${apiUrl}/calendars/${id}`);
     commit('removeCalendar', response.data);
   },
   setCalendar({ commit }, calendar) {

@@ -38,7 +38,7 @@ services:
       dockerfile: Dockerfile
     stdin_open: true
     tty: true
-    command: npm run serve
+    command: npm run local-serve
     ports:
       - '8080:8080'
     volumes:

@@ -86,8 +86,7 @@ export default {
 };
 </script>
 <style>
-.calendar_sheet{
+.calendar_sheet {
   flex: 1;
 }
-
 </style>
