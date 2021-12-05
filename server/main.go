@@ -26,7 +26,7 @@ func NewRouter() *echo.Echo {
 }
 
 func initRouting(e *echo.Echo) {
-	e.GET("/test", helloHandler)
+	e.GET("/test", testHandler)
 	e.GET("/api/v1/events", handler.GetEventsHandler())
 	e.POST("/api/v1/events", handler.CreateEventHandler())
 	e.PUT("/api/v1/events/:id", handler.UpdateEventHandler())
@@ -39,6 +39,6 @@ func initRouting(e *echo.Echo) {
 	e.DELETE("/api/v1/calendars/:id", handler.DeleteCalendarHandler())
 }
 
-func helloHandler(c echo.Context) error {
-	return c.String(http.StatusOK, "test success")
+func testHandler(c echo.Context) error {
+	return c.String(http.StatusOK, "health check ok")
 }
